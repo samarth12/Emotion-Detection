@@ -21,12 +21,12 @@ def clean_str(string):
     return string.strip().lower()
 
 
-def load_data_and_labels(positive_data_file, negative_data_file):
+def load_data(positive_data, negative_data):
 
     # Load data from files
-    positive_examples = list(open(positive_data_file, "r", encoding='utf-8').readlines())
+    positive_examples = list(open(positive_data, "r", encoding='utf-8').readlines())
     positive_examples = [s.strip() for s in positive_examples]
-    negative_examples = list(open(negative_data_file, "r", encoding='utf-8').readlines())
+    negative_examples = list(open(negative_data, "r", encoding='utf-8').readlines())
     negative_examples = [s.strip() for s in negative_examples]
     # Split by words
     x_text = positive_examples + negative_examples
@@ -38,7 +38,7 @@ def load_data_and_labels(positive_data_file, negative_data_file):
     return [x_text, y]
 
 
-def batch_iter(data, batch_size, num_epochs, shuffle=True):
+def generate_batchs(data, batch_size, num_epochs, shuffle=True):
 
     data = np.array(data)
     data_size = len(data)
