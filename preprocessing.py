@@ -2,7 +2,7 @@ import numpy as np
 import re
 import itertools
 from collections import Counter
-
+import csv
 
 def clean_str(string):
     string = re.sub(r"[^A-Za-z0-9(),!?\'\`]", " ", string)
@@ -21,24 +21,37 @@ def clean_str(string):
     return string.strip().lower()
 
 
-def load_data(positive_data, negative_data):
-
-    # Load data from files
-    positive_examples = list(open(positive_data, "r", encoding='utf-8').readlines())
-    positive_examples = [s.strip() for s in positive_examples]
-    negative_examples = list(open(negative_data, "r", encoding='utf-8').readlines())
-    negative_examples = [s.strip() for s in negative_examples]
-    # Split by words
-    x_text = positive_examples + negative_examples
-    x_text = [clean_str(sent) for sent in x_text]
-    # Generate labels
-    positive_labels = [[0, 1] for _ in positive_examples]
-    negative_labels = [[1, 0] for _ in negative_examples]
-    y = np.concatenate([positive_labels, negative_labels], 0)
-    return [x_text, y]
+def load_data():
+    file_reader= open('data/Emotion Phrases.csv', "rt")
+    read = csv.reader(file_reader)
+    data = []
+    for row in read :
+        x_text = [clean_str(sent) for sent in row]
+        data.append(x_text)
 
 
-def generate_batchs(data, batch_size, num_epochs, shuffle=True):
+    #print(data)
+    #x_text = [clean_string(sent) for sent in data]
+    x = [x_text[0] for x_text in data]
+    y = [x_text[1] for x_text in data]
+        #print(y)
+    #print(x)
+    #print(x)
+    all_label = dict()
+    for label in x:
+        if not label in all_label:
+            all_label[label] = len(all_label) + 1
+
+    print(all_label)
+    one_hot = np.identity(len(all_label))
+    x = [one_hot[ all_label[label]-1 ] for label in x]
+    x = [l.tolist() for l in x]
+    x = np.array(x)
+    return[y,x]
+
+
+
+def generate_batches(data, batch_size, num_epochs, shuffle=True):
 
     data = np.array(data)
     data_size = len(data)

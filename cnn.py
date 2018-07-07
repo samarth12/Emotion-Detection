@@ -11,6 +11,7 @@ class TextCNN(object):
         self.input_y = tf.placeholder(tf.float32, [None, num_classes], name="input_y")
         self.dropout_keep_prob = tf.placeholder(tf.float32, name="dropout_keep_prob")
 
+
         # Embedding layer
         with tf.device('/cpu:0'), tf.name_scope("embedding"):
             self.W = tf.Variable(
@@ -19,7 +20,7 @@ class TextCNN(object):
             self.embedded_chars = tf.nn.embedding_lookup(self.W, self.input_x)
             self.embedded_chars_expanded = tf.expand_dims(self.embedded_chars, -1)
 
-        pooled_output = []
+        pooled_outputs = []
 
         for i, filter_size in enumerate(filter_sizes):
             with tf.name_scope("conv-maxpool-%s" % filter_size):
@@ -34,7 +35,7 @@ class TextCNN(object):
                     padding="VALID",
                     name="conv")
                 h = tf.nn.relu(tf.nn.bias_add(conv, b), name="relu")
-                # Maxpooling layer
+                # Maxpooling over the outputs
                 pooled = tf.nn.max_pool(
                     h,
                     ksize=[1, sequence_length - filter_size + 1, 1, 1],
@@ -58,7 +59,7 @@ class TextCNN(object):
             self.predictions = tf.argmax(self.scores, 1, name="predictions")
 
         with tf.name_scope("loss"):
-            losses = tf.nn.softmax_cross_entropy_with_logits(self.scores, self.input_y)
+            losses = tf.nn.softmax_cross_entropy_with_logits(logits=self.scores,labels= self.input_y)
             self.loss = tf.reduce_mean(losses)
 
         with tf.name_scope("accuracy"):

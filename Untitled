@@ -1,0 +1,25 @@
+input = fear,"Every time I imagine that someone I love or I could contact a á
+serious illness, even death."
+
+def clean_str_vn(string):
+    """
+    Tokenization/string cleaning for all datasets except for SST.
+    """
+    string = re.sub(r"[~`@#$%^&*-+]", " ", string)
+    def sharp(str):
+        b = re.sub('\s[A-Za-z]\s\.', ' .', ' '+str)
+        while (b.find('. . ')>=0): b = re.sub(r'\.\s\.\s', '. ', b)
+        b = re.sub(r'\s\.\s', ' # ', b)
+        return b
+    string = sharp(string)
+    string = re.sub(r" : ", ":", string)
+    string = re.sub(r",", " , ", string)
+    string = re.sub(r"!", " ! ", string)
+    string = re.sub(r"\(", " \( ", string)
+    string = re.sub(r"\)", " \) ", string)
+    string = re.sub(r"\?", " \? ", string)
+    string = re.sub(r"\s{2,}", " ", string)
+    return string.strip().lower()
+
+
+clean_string(input)
