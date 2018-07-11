@@ -4,13 +4,14 @@ import numpy as np
 class TextCNN(object):
     def __init__(
       self, sequence_length, num_classes, vocab_size,
-      embedding_size, filter_sizes, num_filters, l2_reg_lambda=0.0):
+      embedding_size, filter_sizes, num_filters, l2_reg_lambda):
 
         # Placeholders for input, output and dropout
         self.input_x = tf.placeholder(tf.int32, [None, sequence_length], name="input_x")
         self.input_y = tf.placeholder(tf.float32, [None, num_classes], name="input_y")
         self.dropout_keep_prob = tf.placeholder(tf.float32, name="dropout_keep_prob")
 
+        l2_loss = tf.constant(0.0)
 
         # Embedding layer
         with tf.device('/cpu:0'), tf.name_scope("embedding"):
@@ -55,13 +56,19 @@ class TextCNN(object):
         with tf.name_scope("output"):
             W = tf.Variable(tf.truncated_normal([num_filters_total, num_classes], stddev=0.1), name="W")
             b = tf.Variable(tf.constant(0.1, shape=[num_classes]), name="b")
+            l2_loss += tf.nn.l2_loss(W)
+            l2_loss += tf.nn.l2_loss(b)
             self.scores = tf.nn.xw_plus_b(self.h_drop, W, b, name="scores")
             self.predictions = tf.argmax(self.scores, 1, name="predictions")
 
         with tf.name_scope("loss"):
             losses = tf.nn.softmax_cross_entropy_with_logits(logits=self.scores,labels= self.input_y)
-            self.loss = tf.reduce_mean(losses)
+            self.loss = tf.reduce_mean(losses) + l2_reg_lambda *l2_loss
 
         with tf.name_scope("accuracy"):
             correct_predictions = tf.equal(self.predictions, tf.argmax(self.input_y, 1))
             self.accuracy = tf.reduce_mean(tf.cast(correct_predictions, "float"), name="accuracy")
+
+        with tf.name_scope('num_correct'):
+            correct_predictions = tf.equal(self.predictions, tf.argmax(self.input_y, 1))
+            self.num_correct = tf.reduce_sum(tf.cast(correct_predictions, 'float'), name='num_correct')
