@@ -22,11 +22,11 @@ def clean_str(string):
 
 
 def load_data(fname):
-    file_reader= open('data/Emotion Phrases.csv', "rt")
+    file_reader= open(fname, "rt")
     read = csv.reader(file_reader)
     data = []
     for row in read :
-        x_text = [clean_string(sent) for sent in row]
+        x_text = [clean_str(sent) for sent in row]
         data.append(x_text)
 
 
@@ -53,7 +53,8 @@ def load_data(fname):
 
     vocabulary, vocabulary_inv = build_vocab(y)
     word2vec = vocab_to_word2vec("GoogleNews-vectors-negative300.bin", vocabulary)
-    embedding_mat = build_word_embedding_mat(model, vocabulary_inv)
+    embedding_mat = build_word_embedding_mat(word2vec, vocabulary_inv)
+
     return y, x, df, l, embedding_mat
 
 def build_vocab(sentences):
@@ -70,7 +71,7 @@ def build_vocab(sentences):
 def build_word_embedding_mat(word_vecs, vocabulary_inv, k=300):
 
     vocab_size = len(vocabulary_inv)
-    embedding_mat = np.zeros(shape=(9000, k), dtype='float32')
+    embedding_mat = np.zeros(shape=(9017, k), dtype='float32')
     for idx in range(len(vocabulary_inv)):
         embedding_mat[idx + 1] = word_vecs[vocabulary_inv[idx]]
     print "Embedding matrix of size " + str(np.shape(embedding_mat))
@@ -118,6 +119,40 @@ def build_input_data(sentences, labels, vocabulary):
     #print(x)
     #print(y)
     return [x, y]
+
+def load_embedding_vectors(vocabulary):
+    # load embedding_vectors from the word2vec
+    filename = 'GoogleNews-vectors-negative300.bin'
+    encoding = 'utf-8'
+    with open(filename, "rb") as f:
+        header = f.readline()
+        vocab_size, vector_size = map(int, header.split())
+        # initial matrix with random uniform
+        embedding_vectors = np.random.uniform(-0.25, 0.25, (len(vocabulary), vector_size))
+        if True:
+            binary_len = np.dtype('float32').itemsize * vector_size
+            for line_no in range(vocab_size):
+                word = []
+                while True:
+                    ch = f.read(1)
+                    if ch == b' ':
+                        break
+                    if ch == b'':
+                        raise EOFError("unexpected end of input; is count incorrect or file otherwise damaged?")
+                    if ch != b'\n':
+                        word.append(ch)
+                word = str(b''.join(word))
+                idx = vocabulary.get(word)
+                if idx != 0:
+                    embedding_vectors[idx] = np.fromstring(f.read(binary_len), dtype='float32')
+                else:
+
+                    f.seek(binary_len, 1)
+        #a = np.delete(embedding_vectors, slice(8999,9016), axis =0)
+        #print(a)
+
+        f.close()
+        return embedding_vectors
 
 def generate_batches(data, batch_size, num_epochs, shuffle=True):
 
