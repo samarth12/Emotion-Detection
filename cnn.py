@@ -4,7 +4,7 @@ import numpy as np
 class TextCNN(object):
     def __init__(
       self, sequence_length, num_classes, vocab_size,
-      embedding_size, filter_sizes, num_filters, l2_reg_lambda):
+      embedding_size, filter_sizes, num_filters,embedding_mat, l2_reg_lambda):
 
         # Placeholders for input, output and dropout
         self.input_x = tf.placeholder(tf.int32, [None, sequence_length], name="input_x")
