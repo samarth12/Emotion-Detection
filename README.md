@@ -13,8 +13,8 @@ It is a multi class text classification problem. A CNN was used to build the mod
 
 Here are the results of training and testing the model for the parameters recorded in parameters.json
 
-Accuracy on dev set: 0.610612244898
-Accuracy on train set is 0.982230392157 based on the best model
-Accuracy on test set is 0.589157413455 based on the best model
+Accuracy on dev set: 0.608163265306
+Accuracy on train set is 0.986928104575 based on the best model
+Accuracy on test set is 0.595689092097 based on the best model
 
 To run the CNN Classifier: python training.py
