@@ -134,11 +134,11 @@ if __name__ == "__main__":
     sentences, labels = loadData('data/Emotion Phrases.csv')
     embeddings = gloveVec('glove.6B.300d.txt')
     vocab, data = createVocabAndData(sentences)
-    embedding_mat = createEmbeddingMatrix(vocab,embeddings)
+    embedding_mat = createEmbeddingMatrix(vocab,embieddings)
     pickle.dump([data, labels, embedding_mat], open('embedding_matrix.pkl', 'wb'))
     print ("Data created")
 
     print("Train Test split")
     X_train, X_test, y_train, y_test = train_test_split(data, labels, test_size=TEST_SPLIT, random_state=42)
 
-    lstmModel(embedding_mat,40)
+    lstmModel(embedding_mat,31)
