@@ -85,7 +85,7 @@ def loadData(filename):
     x = [l.tolist() for l in x]
     x = np.array(x)
 
-    return y, x
+    return y, x, all_label
 
 def createVocabAndData(sentences):
     tokenizer = Tokenizer(num_words=MAX_NB_WORDS)
